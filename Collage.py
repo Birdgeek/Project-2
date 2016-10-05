@@ -1,24 +1,27 @@
 def collage():
   #Written by Brad Snurka
   #10/4/16 - 10/17/16
-  #Ver 0.1
+  #Ver 0.2
   
   canvas = makeEmptyPicture(700, 515, makeColor(25, 13, 71))
 
-  signature = makePicture(getMediaPath("signature.jpg"))
+  signaturePic = makePicture(getMediaPath("signature.jpg"))
   sun = makePicture(getMediaPath("volleyball.png"))
+
+  placeSun(sun, canvas)
   
-  placeSun(sun)
   
-  
-  signature(signature, canvas) #Writes my signature to canvas in upper right - Should be last
+  signature(signaturePic, canvas) #Writes my signature to canvas in upper right - Should be last
   show(canvas)
   
 	#Indivdual Planets
 	
 	#Sun
-def placeSun(src, target):
-	darken(sun, 4)
+def placeSun(sun, target):
+  #darken(sun, 4)
+  sun = scaleDown(sun, 4)
+  explore(sun)
+  copy(sun, 82, 32, 122, 116, 0, 0, target)
 	
 	
 	
@@ -26,11 +29,14 @@ def placeSun(src, target):
   #Functions Used
   
   #Copys a chunk from one picture to another
-def copy(picture, startX, endX, target):
+def copy(src, startX, startY, endX, endY, locX, locY, target):
   #Copies from input picture from Start-end px and puts it to the target in corresponding location
   for x in range(startX, endX):
-    for y in range(0, getHeight(picture)):
-      setColor(getPixel(target, x, y), getColor(getPixel(picture, x/2, y))) #Need /2 to stretch the picture out properly to fit new canvas size
+    for y in range(startY, endY):
+      color = getColor(getPixel(src, x, y))
+      setColor(getPixel(target, locX, locY), color)
+      locX = locX + 1
+      locY = locY + 1
 	  
   #Gradually blurs a picture
   #Can be run multiple times in a loop to blue a lot    
@@ -53,7 +59,6 @@ def blur(src):
   
   #Scales a picture down from its original size to a new size as determined by scale factor  
 def scaleDown(src, scaleFactor):
-  print getWidth(src)/int(scaleFactor)
   newSize = makeEmptyPicture(getWidth(src)/int(scaleFactor), getHeight(src)/int(scaleFactor))
   sourceX = 0
   for x in range(0,getWidth(src)/scaleFactor):
