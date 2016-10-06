@@ -1,43 +1,96 @@
+from java.util import Random
+
+
 def collage():
   #Written by Brad Snurka
   #10/4/16 - 10/17/16
-  #Ver 0.2
+  #Ver 0.4
   
-  canvas = makeEmptyPicture(700, 515, makeColor(25, 13, 71))
+  canvas = makeEmptyPicture(700, 515, black)
 
   signaturePic = makePicture(getMediaPath("signature.jpg"))
   sun = makePicture(getMediaPath("volleyball.png"))
-
-  placeSun(sun, canvas)
+  mercury = makePicture(getMediaPath("planet.png"))
+  venus = makePicture(getMediaPath("planet.png"))
+  earth = makePicture(getMediaPath("earth.jpg"))
+  mars = makePicture(getMediaPath("planet.png"))
   
+  makeStars(canvas)
+  placeSun(sun, canvas)
+  placeMercury(mercury, canvas)
+  placeVenus(venus, canvas)
+  placeEarth(earth, canvas)
+  placeMars(mars, canvas)
   
   signature(signaturePic, canvas) #Writes my signature to canvas in upper right - Should be last
-  show(canvas)
+  explore(canvas)
   
-	#Indivdual Planets
-	
+  #Indivdual Planets
+  #Stars
+def makeStars(target):
+  for px in getPixels(target):
+    rand = Random()
+    value = rand.nextInt(125)
+    if (value == 7):
+      setColor(px, pickStarColor())
+   
 	#Sun
 def placeSun(sun, target):
-  #darken(sun, 4)
-  sun = scaleDown(sun, 4)
-  explore(sun)
-  copy(sun, 82, 32, 122, 116, 0, 0, target)
+  sun = scaleDown(sun, 2)
+  yellowrize(sun)
+  copy(sun, 161, 66, 250, 236, 0, (getHeight(target)/2) - (236/2), 57, 51, 29, target)
 	
+def placeMercury(src, target):
+  src = scaleDown(src, 16)
+  brownerize(src)
+  copy(src, 1, 1, 24, 18, 144, 236, 153, 153, 51, target)
 	
-	
+def placeVenus(src, target):
+  src = scaleDown(src, 10)
+  src = grayscale(src)
+  copy(src, 1, 1, 39, 29, 200, 236, 255, 255, 255, target)
+
+def placeEarth(src, target):
+  src = scaleDown(src, 6)
+  copy(src, 1, 1, 45, 45, 273, 236, 255, 255, 255, target)
 	
   #Functions Used
   
   #Copys a chunk from one picture to another
-def copy(src, startX, startY, endX, endY, locX, locY, target):
+def copy(src, startX, startY, endX, endY, locX, locY, red, green, blue, target):
   #Copies from input picture from Start-end px and puts it to the target in corresponding location
+  storeY = locY
   for x in range(startX, endX):
     for y in range(startY, endY):
-      color = getColor(getPixel(src, x, y))
-      setColor(getPixel(target, locX, locY), color)
-      locX = locX + 1
+      px = getPixel(src, x, y)
+      if (getRed(px) != red) and (getGreen(px) != green) and (getBlue(px) != blue):
+        color = getColor(getPixel(src, x, y))
+        setColor(getPixel(target, locX, locY), color)
       locY = locY + 1
-	  
+    locX = locX + 1
+    locY = storeY
+    
+  #Returns random star looking color
+def pickStarColor():
+  rand = Random()
+  value = rand.nextInt(50)
+  if (value == 7) or (value == 15):
+    return blue
+  elif (value == 8) or (value == 42):
+    return yellow
+  elif (value == 9) or (value == 32):
+    return makeColor(127, 174, 255)
+  elif (value == 22) or (value == 30):
+    return makeColor(255, 176, 127)
+  elif (value == 25) or (value == 26):
+    return makeColor(170, 121, 216)
+  elif (value == 18) or (value == 4):
+    return makeColor(156, 216, 121)
+  elif (value == 12) or (value == 24):
+    return makeColor(216, 204, 121)
+  else:
+    return white
+  
   #Gradually blurs a picture
   #Can be run multiple times in a loop to blue a lot    
 def blur(src):
@@ -86,7 +139,7 @@ def scaleUp(src, target, scaleFactor):
 def lighten(src, num):
   for num in range(num):
     for px in getPixels(src):
-      setColor(px, makeLigher(getColor(px)))
+      setColor(px, makeLighter(getColor(px)))
   return src
 
   #Darkens a picture a number of times based on an input number
@@ -126,6 +179,20 @@ def luminance(pixel):
   g = getGreen(pixel)
   b = getBlue(pixel)
   return (r+g+b)/3
+  
+  #Gradually sets all colors of all pictures towards yellow
+def yellowrize(src):
+  for px in getPixels(src):
+    setColor(px, makeColor(getRed(px) * 1.5, getGreen(px) * 1.5, getBlue(px) * .3))
+  return src
+  
+  #Gradually shifts all pixels towards brown
+def brownerize(src):
+  for px in getPixels(src):
+    if (getRed(px) < 114):
+      setColor(px, makeColor(getRed(px) * 1.2, getGreen(px) * 1.2, getBlue(px) * .2))
+    else:
+      setColor(px, makeColor(getRed(px) * .6, getGreen(px) * .6, getBlue(px) * .2))
   
   #Converts a given picture to blue cyanotype
 def cyanotype(src):
@@ -179,7 +246,7 @@ def chromakeySun(src, target):
     y = getY(px)
     if ((getRed(px) > 230) and (getGreen(px) > 230) and (getBlue(px) < 100)):
       bgpx = getPixel(target, x, y)
-      bgcol = getColor(bgpx)
+      bgcol = getColor(src)
       setColor(px, bgcol)
 			
   #Writes my signature at a scale of 1/10th to the canvas
