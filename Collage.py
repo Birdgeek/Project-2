@@ -4,7 +4,7 @@ from java.util import Random
 def collage():
   #Written by Brad Snurka
   #10/4/16 - 10/17/16
-  #Ver 0.4
+  #Ver 0.5
   
   canvas = makeEmptyPicture(700, 515, black)
 
@@ -14,6 +14,9 @@ def collage():
   venus = makePicture(getMediaPath("planet.png"))
   earth = makePicture(getMediaPath("earth.jpg"))
   mars = makePicture(getMediaPath("planet.png"))
+  jupiter = makePicture(getMediaPath("planet.png"))
+  saturn = makePicture(getMediaPath("planet.png"))
+  uranus = makePicture(getMediaPath("planet.png"))
   
   makeStars(canvas)
   placeSun(sun, canvas)
@@ -21,12 +24,15 @@ def collage():
   placeVenus(venus, canvas)
   placeEarth(earth, canvas)
   placeMars(mars, canvas)
+  placeJupiter(jupiter, canvas)
+  placeSaturn(saturn, canvas)
+  placeUranus(uranus, canvas)
   
   signature(signaturePic, canvas) #Writes my signature to canvas in upper right - Should be last
   explore(canvas)
   
   #Indivdual Planets
-  #Stars
+
 def makeStars(target):
   for px in getPixels(target):
     rand = Random()
@@ -34,7 +40,7 @@ def makeStars(target):
     if (value == 7):
       setColor(px, pickStarColor())
    
-	#Sun
+
 def placeSun(sun, target):
   sun = scaleDown(sun, 2)
   yellowrize(sun)
@@ -53,7 +59,37 @@ def placeVenus(src, target):
 def placeEarth(src, target):
   src = scaleDown(src, 6)
   copy(src, 1, 1, 45, 45, 273, 236, 255, 255, 255, target)
+  
+def placeMars(src, target):
+  src = scaleDown(src, 9)
+  for i in range(2):
+    src = blur(src)
+  copyColor(src, 1, 1, 43, 32, 341, 236, 255, 255, 255, target, makeColor(186, 102, 24))
 	
+def placeJupiter(src, target):
+  src = scaleDown(src, 5)
+  darken(src, 2)
+  mirrorHoriz(src)
+  swap(src)
+  swap(src)
+  chromaColor(src, 91, 104, 25, makeColor(110, 35, 69))
+  copy(src, 1, 1, 79, 60, 416, 220, 124, 124, 124, target)
+  
+def placeSaturn(src, target):
+  src = scaleDown(src, 7)
+  swap(src)
+  mirrorVert(src)
+  copy(src, 1, 1, 56, 42, 514, 220, 255, 255, 255, target)
+  
+def placeUranus(src, target):
+  src = scaleDown(src, 10)
+  mirrorVert(src)
+  cyanotype(src)
+  lighten(src, 1)
+  explore(src)
+  copy(src, 1, 1, 39, 29, 598, 236, 255, 255, 255, target)
+  
+  
   #Functions Used
   
   #Copys a chunk from one picture to another
@@ -65,6 +101,19 @@ def copy(src, startX, startY, endX, endY, locX, locY, red, green, blue, target):
       px = getPixel(src, x, y)
       if (getRed(px) != red) and (getGreen(px) != green) and (getBlue(px) != blue):
         color = getColor(getPixel(src, x, y))
+        setColor(getPixel(target, locX, locY), color)
+      locY = locY + 1
+    locX = locX + 1
+    locY = storeY
+    
+  #Copys a chunk from one picture to another, also paints the whole thing to be copied to a unified color
+def copyColor(src, startX, startY, endX, endY, locX, locY, red, green, blue, target, color):
+  #Copies from input picture from Start-end px and puts it to the target in corresponding location
+  storeY = locY
+  for x in range(startX, endX):
+    for y in range(startY, endY):
+      px = getPixel(src, x, y)
+      if (getRed(px) != red) and (getGreen(px) != green) and (getBlue(px) != blue):
         setColor(getPixel(target, locX, locY), color)
       locY = locY + 1
     locX = locX + 1
@@ -123,17 +172,18 @@ def scaleDown(src, scaleFactor):
   return newSize
   
   #Scales a picture up from its input size to a new size as determined by scale factor  
-def scaleUp(src, target, scaleFactor):
+def scaleUp(src, scaleFactor):
+  newSize = makeEmptyPicture(getWidth(src) * scaleFactor, getHeight(src) * scaleFactor)
   sourceX = 0
-  for targetX in range(0, getWidth(src) * scaleFactor):
+  for x in range(0, getWidth(src) * scaleFactor):
     sourceY = 0
-    for targetY in range(0, getHeight(src) * scaleFactor):
+    for y in range(0, getHeight(src) * scaleFactor):
       srcpx = getPixel(src, int(sourceX), int(sourceY))
       color = getColor(srcpx)
-      setColor(getPixel(target, targetX, targetY),color)
+      setColor(getPixel(newSize, x, y),color)
       sourceY = sourceY + float(1/float(scaleFactor))
     sourceX = sourceX + float(1/float(scaleFactor))
-  return target
+  return newSize
 
   #Lightens a pictures a number of times based on input number
 def lighten(src, num):
@@ -151,7 +201,7 @@ def darken(src, num):
   
   #Mirrors the first quarter of a picture to the opposite quarter
 def mirrorVert(src): 
-  mirrorPoint = getWidth(src)/4
+  mirrorPoint = getWidth(src)/2
   width = getWidth(src)
   for y in range(0, getHeight(src)):
     for x in range(0,mirrorPoint):
@@ -240,6 +290,12 @@ def posterize(src):
       setColor(px, white)
   return src  
 	
+def chromaColor(src, red, green, blue, newColor):
+  for px in getPixels(src):
+    if ((getRed(px) == red) and (getGreen(px) == green) and (getBlue(px) == blue)):
+      setColor(px, newColor)
+  return src
+  
 def chromakeySun(src, target):
   for px in getPixels(src):
     x = getX(px)
@@ -254,7 +310,8 @@ def signature(src, target):
   src = scaleDown(src, 10)
   for px in getPixels(src):
     if (getRed(px) < 50) and (getGreen(px) < 50) and (getBlue(px) < 50):
-      srcColor = makeColor(107, 106, 109)
+      #srcColor = makeColor(107, 106, 109)
+      srcColor = white
       trgLoc = getPixel(target, getX(px), getY(px))
       setColor(trgLoc, srcColor)
   return target
