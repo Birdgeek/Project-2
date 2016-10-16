@@ -1,13 +1,15 @@
-from java.util import Random
+from java.util import Random #Used for star generation
 
 
 def collage():
   #Written by Brad Snurka
   #10/4/16 - 10/17/16
-  #Ver 0.5
+  #Ver 1.0
   
-  canvas = makeEmptyPicture(700, 515, black)
+  canvas = makeEmptyPicture(700, 515, black) #Make our empty canvas
 
+   #Individual picture creation - Must use "setMediaPath()" before hand
+   
   signaturePic = makePicture(getMediaPath("signature.jpg"))
   sun = makePicture(getMediaPath("volleyball.png"))
   mercury = makePicture(getMediaPath("planet.png"))
@@ -17,6 +19,9 @@ def collage():
   jupiter = makePicture(getMediaPath("planet.png"))
   saturn = makePicture(getMediaPath("planet.png"))
   uranus = makePicture(getMediaPath("planet.png"))
+  neptune = makePicture(getMediaPath("planet.png"))
+  
+  #Actual creation of the collage
   
   makeStars(canvas)
   placeSun(sun, canvas)
@@ -27,16 +32,16 @@ def collage():
   placeJupiter(jupiter, canvas)
   placeSaturn(saturn, canvas)
   placeUranus(uranus, canvas)
+  placeNeptune(neptune, canvas)
+  signature(signaturePic, canvas) #Writes my signature to canvas in upper right - Should be last thing to be done
+  show(canvas)
   
-  signature(signaturePic, canvas) #Writes my signature to canvas in upper right - Should be last
-  explore(canvas)
-  
-  #Indivdual Planets
+  #Indivdual Planets functions
 
 def makeStars(target):
   for px in getPixels(target):
     rand = Random()
-    value = rand.nextInt(125)
+    value = rand.nextInt(125) #.008% chance of a pixel become a star pixel
     if (value == 7):
       setColor(px, pickStarColor())
    
@@ -85,14 +90,20 @@ def placeUranus(src, target):
   src = scaleDown(src, 10)
   mirrorVert(src)
   cyanotype(src)
-  lighten(src, 1)
-  explore(src)
-  copy(src, 1, 1, 39, 29, 598, 236, 255, 255, 255, target)
+  copy(src, 1, 1, 39, 29, 590, 220, 255, 255, 255, target)
+	
+def placeNeptune(src, target):
+  src = scaleDown(src, 10)
+  swap(src)
+  cyanotype(src)
+  swap(src)
+  swap(src)
+  copy(src, 1, 1, 39, 29, 640, 220, 255, 255, 255, target)
   
   
   #Functions Used
   
-  #Copys a chunk from one picture to another
+  #Copys a picture from one picture to another ingoring a certain color
 def copy(src, startX, startY, endX, endY, locX, locY, red, green, blue, target):
   #Copies from input picture from Start-end px and puts it to the target in corresponding location
   storeY = locY
@@ -170,34 +181,6 @@ def scaleDown(src, scaleFactor):
       sourceY = sourceY + scaleFactor
     sourceX = sourceX + scaleFactor
   return newSize
-  
-  #Scales a picture up from its input size to a new size as determined by scale factor  
-def scaleUp(src, scaleFactor):
-  newSize = makeEmptyPicture(getWidth(src) * scaleFactor, getHeight(src) * scaleFactor)
-  sourceX = 0
-  for x in range(0, getWidth(src) * scaleFactor):
-    sourceY = 0
-    for y in range(0, getHeight(src) * scaleFactor):
-      srcpx = getPixel(src, int(sourceX), int(sourceY))
-      color = getColor(srcpx)
-      setColor(getPixel(newSize, x, y),color)
-      sourceY = sourceY + float(1/float(scaleFactor))
-    sourceX = sourceX + float(1/float(scaleFactor))
-  return newSize
-
-  #Lightens a pictures a number of times based on input number
-def lighten(src, num):
-  for num in range(num):
-    for px in getPixels(src):
-      setColor(px, makeLighter(getColor(px)))
-  return src
-
-  #Darkens a picture a number of times based on an input number
-def darken(src, num):
-  for num in range(num):
-    for px in getPixels(src):
-      setColor(px, makeDarker(getColor(px)))
-  return src
   
   #Mirrors the first quarter of a picture to the opposite quarter
 def mirrorVert(src): 
@@ -278,24 +261,14 @@ def swap(src):
     setColor(p, makeColor(blue, red, green))
   return src
   
-  #Posterizes a picture
-def posterize(src):
-  for px in getPixels(src):
-    luminance = luminance(px)
-    if (luminance < 50):
-      setColor(px, black)
-    elif (50 <= luminance <= 165):
-      setColor(px, gray)
-    elif (luminance > 165):
-      setColor(px, white)
-  return src  
-	
+  #Sets color of a single color, to a different color. - I.E. All 255,255,255 turning to 127,127,127
 def chromaColor(src, red, green, blue, newColor):
   for px in getPixels(src):
     if ((getRed(px) == red) and (getGreen(px) == green) and (getBlue(px) == blue)):
       setColor(px, newColor)
   return src
-  
+
+  #Chromakey function used to copy the sun by ignoring the background
 def chromakeySun(src, target):
   for px in getPixels(src):
     x = getX(px)
@@ -310,7 +283,6 @@ def signature(src, target):
   src = scaleDown(src, 10)
   for px in getPixels(src):
     if (getRed(px) < 50) and (getGreen(px) < 50) and (getBlue(px) < 50):
-      #srcColor = makeColor(107, 106, 109)
       srcColor = white
       trgLoc = getPixel(target, getX(px), getY(px))
       setColor(trgLoc, srcColor)
