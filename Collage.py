@@ -35,7 +35,7 @@ def collage():
   placeUranus(uranus, canvas)
   placeNeptune(neptune, canvas)
   signature(signaturePic, canvas) #Writes my signature to canvas in upper right - Should be last thing to be done
-  show(canvas)
+  explore(canvas)
   
   #Indivdual Planets functions
 
