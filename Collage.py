@@ -5,6 +5,7 @@ def collage():
   #Written by Brad Snurka
   #10/4/16 - 10/17/16
   #Ver 1.0
+  #This project has been tracked on github @ https://github.com/Birdgeek/Project-2
   
   canvas = makeEmptyPicture(700, 515, black) #Make our empty canvas
 
