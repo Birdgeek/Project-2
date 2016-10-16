@@ -74,12 +74,11 @@ def placeMars(src, target):
 	
 def placeJupiter(src, target):
   src = scaleDown(src, 5)
-  darken(src, 2)
   mirrorHoriz(src)
   swap(src)
   swap(src)
   chromaColor(src, 91, 104, 25, makeColor(110, 35, 69))
-  copy(src, 1, 1, 79, 60, 416, 220, 124, 124, 124, target)
+  copy(src, 1, 1, 79, 60, 416, 220, 255, 255, 255, target)
   
 def placeSaturn(src, target):
   src = scaleDown(src, 7)
